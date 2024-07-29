@@ -1,7 +1,10 @@
-import mongoose, { Document, Schema } from 'mongoose';
+import mongoose, { Schema, Document, Model } from 'mongoose';
 import bcrypt from 'bcrypt';
+import BaseModel, { IBaseModel } from './base';
+import { autoIncrementId } from '../middlewares/autoIncrement';
 
-export interface IUser extends Document {
+// Extend the IBaseModel to include common fields
+export interface IUser extends IBaseModel {
     name: string;
     email: string;
     password: string;
@@ -16,7 +19,7 @@ const userSchema: Schema<IUser> = new Schema({
     role: { type: String, default: 'member' }
 });
 
-// Let Bcrypt hashing the passwords
+// Let Bcrypt hash the passwords before saving
 userSchema.pre<IUser>('save', async function (next) {
     if (!this.isModified('password')) {
         return next();
@@ -26,14 +29,20 @@ userSchema.pre<IUser>('save', async function (next) {
         this.password = await bcrypt.hash(this.password, salt);
         next();
     } catch (err) {
-        const error = err as mongoose.CallbackError;
-        next(error);
+        next(err as mongoose.CallbackError);
     }
 });
 
+// Method to compare passwords
 userSchema.methods.comparePassword = async function (candidatePassword: string): Promise<boolean> {
     return bcrypt.compare(candidatePassword, this.password);
 };
+
+// Apply the auto-increment ID middleware
+userSchema.pre('save', autoIncrementId);
+
+// Inherit from BaseModel schema
+userSchema.add(BaseModel.schema.obj);
 
 const User = mongoose.model<IUser>('User', userSchema);
 export default User;

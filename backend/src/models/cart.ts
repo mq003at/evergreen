@@ -1,12 +1,22 @@
-import mongoose, { Document, Schema } from 'mongoose';
+import mongoose, { Schema, Document } from 'mongoose';
+import BaseModel, { IBaseModel } from './base';
+import { autoIncrementId } from '../middlewares/autoIncrement';
 
-export interface ICart extends Document {
-    userId: mongoose.Types.ObjectId;
+export interface ICart extends IBaseModel {
+    user: mongoose.Types.ObjectId; // Reference to User model
+    items: mongoose.Types.ObjectId[]; // Array of CartItem IDs
 }
 
-const cartSchema: Schema = new Schema({
-    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }
+const cartSchema: Schema<ICart> = new Schema({
+    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    items: [{ type: mongoose.Schema.Types.ObjectId, ref: 'CartItem' }]
 });
+
+// Apply the auto-increment ID middleware
+cartSchema.pre('save', autoIncrementId);
+
+// Inherit from BaseModel schema
+cartSchema.add(BaseModel.schema.obj);
 
 const Cart = mongoose.model<ICart>('Cart', cartSchema);
 export default Cart;

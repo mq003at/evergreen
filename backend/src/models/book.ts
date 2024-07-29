@@ -1,28 +1,26 @@
-import mongoose, { Document, Schema } from "mongoose";
+import mongoose, { Schema, Document } from 'mongoose';
+import BaseModel, { IBaseModel } from './base';
+import { autoIncrementId } from '../middlewares/autoIncrement';
 
-export interface IBook extends Document {
+export interface IBook extends IBaseModel {
     title: string;
-    published: Date;
-    copies: number;
-    categoryId: mongoose.Types.ObjectId;
+    author: mongoose.Types.ObjectId; // Reference to Author model
+    genre: string;
+    publishedDate: Date;
 }
 
-const bookSchema: Schema = new Schema({
-    title: {
-        type: String,
-        required: true
-    },
-    published: {
-        type: Date,
-        required: true
-    },
-    copies: {
-        type: Number,
-        required: true
-    },
-    categoryId: {type: mongoose.Types.ObjectId, ref: 'Category' }
+const bookSchema: Schema<IBook> = new Schema({
+    title: { type: String, required: true },
+    author: { type: mongoose.Schema.Types.ObjectId, ref: 'Author', required: true },
+    genre: { type: String, required: true },
+    publishedDate: { type: Date, required: true }
 });
 
-const Book = mongoose.model<IBook>('Book', bookSchema);
+// Apply the auto-increment ID middleware
+bookSchema.pre('save', autoIncrementId);
 
+// Inherit from BaseModel schema
+bookSchema.add(BaseModel.schema.obj);
+
+const Book = mongoose.model<IBook>('Book', bookSchema);
 export default Book;
