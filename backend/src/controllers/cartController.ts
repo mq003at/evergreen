@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { getCartByUserId, addToCart, removeFromCart, clearCart } from '../services/cartService';
-import { AxiosError } from 'axios';
+
 
 export const getCartByUserIdHandler = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -11,7 +11,7 @@ export const getCartByUserIdHandler = async (req: Request, res: Response): Promi
         }
         res.json(cart);
     } catch (err) {
-        const error = err as AxiosError;
+        const error = err as Error;
         res.status(500).send(error.message);
     }
 };
@@ -21,7 +21,7 @@ export const addToCartHandler = async (req: Request, res: Response): Promise<voi
         const cartItem = await addToCart(req.params.userId, req.body.bookId);
         res.status(201).json(cartItem);
     } catch (err) {
-        const error = err as AxiosError;
+        const error = err as Error;
         res.status(400).send(error.message);
     }
 };
@@ -35,7 +35,7 @@ export const removeFromCartHandler = async (req: Request, res: Response): Promis
         }
         res.send('Item removed from cart');
     } catch (err) {
-        const error = err as AxiosError;
+        const error = err as Error;
         res.status(500).send(error.message);
     }
 };
@@ -45,7 +45,7 @@ export const clearCartHandler = async (req: Request, res: Response): Promise<voi
         await clearCart(req.params.userId);
         res.send('Cart cleared');
     } catch (err) {
-        const error = err as AxiosError;
+        const error = err as Error;
         res.status(500).send(error.message);
     }
 };

@@ -1,7 +1,6 @@
-import mongoose, { ConnectOptions } from 'mongoose';
+import mongoose, { CallbackError, ConnectOptions } from 'mongoose';
 import dotenv from 'dotenv';
 import { ConnectionOptions } from 'tls';
-import { AxiosError } from 'axios';
 
 dotenv.config();
 
@@ -13,7 +12,7 @@ const connectDb = async(): Promise<void> => {
         } as ConnectionOptions);
         console.log('MongoDB Connected')
     } catch (err) {
-        const error = err as AxiosError;
+        const error = err as Error;
         console.error(error.message);
         process.exit(1);
     }

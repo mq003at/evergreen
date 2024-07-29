@@ -24,3 +24,4 @@ export const autoIncrementId = async function (this: Document, next: NextFunctio
 };
 
 // NOTE: This and timeStamp are both volatile. Double check database record to see if the data we have is correct.
+// Double check on Stackoverflow to see if the codes function correctly most of the time

@@ -1,13 +1,13 @@
 import { Request, Response } from 'express';
 import { getAllBooks, getBookById, createBook, updateBook, deleteBook } from '../services/bookService';
-import { AxiosError } from 'axios';
+
 
 export const getAllBooksHandler = async (req: Request, res: Response): Promise<void> => {
     try {
         const books = await getAllBooks();
         res.json(books);
     } catch (err) {
-        const error = err as AxiosError;
+        const error = err as Error;
         res.status(500).send(error.message);
     }
 };
@@ -21,7 +21,7 @@ export const getBookByIdHandler = async (req: Request, res: Response): Promise<v
         }
         res.json(book);
     } catch (err) {
-        const error = err as AxiosError;
+        const error = err as Error;
         res.status(500).send(error.message);
     }
 };
@@ -31,7 +31,7 @@ export const createBookHandler = async (req: Request, res: Response): Promise<vo
         const book = await createBook(req.body);
         res.status(201).json(book);
     } catch (err) {
-        const error = err as AxiosError;
+        const error = err as Error;
         res.status(400).send(error.message);
     }
 };
@@ -45,7 +45,7 @@ export const updateBookHandler = async (req: Request, res: Response): Promise<vo
         }
         res.json(book);
     } catch (err) {
-        const error = err as AxiosError;
+        const error = err as Error;
         res.status(400).send(error.message);
     }
 };
@@ -59,7 +59,7 @@ export const deleteBookHandler = async (req: Request, res: Response): Promise<vo
         }
         res.send('Book deleted');
     } catch (err) {
-        const error = err as AxiosError;
+        const error = err as Error;
         res.status(500).send(error.message);
     }
 };

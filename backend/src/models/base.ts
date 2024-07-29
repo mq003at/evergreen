@@ -1,10 +1,26 @@
-import mongoose, { Schema, Document, Model } from 'mongoose';
+import mongoose, { Schema, Document } from 'mongoose';
 import { setUpdatedAtOnUpdate } from '../middlewares/timeStamp';
+
+/*
+* MongoDb treats data as Dynamic JSON object called Document.
+* It contains 2 parts: Fields (id, name, etc.) and Mongoose Method: .save, .remove, .update, etc.
+* Other methods can be implemented into the document interface.
+* Because the Document is DYNAMIC, if we need to access any of the field, we need to declare in the interface
+*   so the backend understands that the field must/may not be existed. 
+*/
 
 export interface IBaseModel extends Document {
     id: number;
     createdAt: Date;
     updatedAt: Date;
+}
+
+/* Used for increment. Update and createdAt does not need because 
+* createdAt is added from constructor, and updatedAt is just a modification before
+* data is added into the database.
+*/
+export interface IBaseDocument extends Document {
+    id: number;
 }
 
 // Define a generic base schema

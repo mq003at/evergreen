@@ -2,6 +2,16 @@ import mongoose, { Schema, Document, Model } from 'mongoose';
 import bcrypt from 'bcrypt';
 import BaseModel, { IBaseModel } from './base';
 import { autoIncrementId } from '../middlewares/autoIncrement';
+import { handleUserCart, hashPassword } from '../middlewares/modelMiddlewares/user.middlewares';
+
+/*
+* Custom type for Mongoose Document, User version.
+* Note that for MongoDb, the data entry is DYNAMIC, meaning there could be more fields than what we declared in schema. Like, just add them in.
+* By defining IUserDocument, I declare that no matter what, there would be a password field in the Document
+*/
+export interface IUserDocument extends Document {
+    password: string;
+}
 
 // Extend the IBaseModel to include common fields
 export interface IUser extends IBaseModel {
@@ -19,19 +29,8 @@ const userSchema: Schema<IUser> = new Schema({
     role: { type: String, default: 'member' }
 });
 
-// Let Bcrypt hash the passwords before saving
-userSchema.pre<IUser>('save', async function (next) {
-    if (!this.isModified('password')) {
-        return next();
-    }
-    try {
-        const salt = await bcrypt.genSalt(10);
-        this.password = await bcrypt.hash(this.password, salt);
-        next();
-    } catch (err) {
-        next(err as mongoose.CallbackError);
-    }
-});
+// Apply the password hashing middleware
+userSchema.pre<IUser>('save', hashPassword);
 
 // Method to compare passwords
 userSchema.methods.comparePassword = async function (candidatePassword: string): Promise<boolean> {
@@ -40,6 +39,10 @@ userSchema.methods.comparePassword = async function (candidatePassword: string):
 
 // Apply the auto-increment ID middleware
 userSchema.pre('save', autoIncrementId);
+
+// Apply the `deleteCartOnUserRemove` middleware
+userSchema.post('findOneAndDelete', handleUserCart.deleteCartOnUserRemove);
+userSchema.post('deleteOne', handleUserCart.deleteCartOnUserRemove);
 
 // Inherit from BaseModel schema
 userSchema.add(BaseModel.schema.obj);

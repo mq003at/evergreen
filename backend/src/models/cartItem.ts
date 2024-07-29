@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 import BaseModel, { IBaseModel } from './base';
 import { autoIncrementId } from '../middlewares/autoIncrement';
 
