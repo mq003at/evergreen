@@ -12,9 +12,6 @@ const cartSchema: Schema<ICart> = new Schema({
     items: [{ type: mongoose.Schema.Types.ObjectId, ref: 'CartItem' }]
 });
 
-// Apply the auto-increment ID middleware
-cartSchema.pre('save', autoIncrementId);
-
 // Inherit from BaseModel schema
 cartSchema.add(BaseModel.schema.obj);
 

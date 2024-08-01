@@ -36,3 +36,12 @@ export const clearCart = async (userId: string): Promise<void> => {
 
     await CartItem.deleteMany({ cartId: cart._id });
 }
+
+export const deleteCart = async(userId: string): Promise<void> => {
+    const cart = await Cart.findOne({ user: userId });
+
+    if (cart) {
+        await CartItem.deleteMany({ _id: { $in: cart.items }});
+        await Cart.findByIdAndDelete(cart._id);
+    }
+}

@@ -1,20 +1,17 @@
 import { Document, Model, CallbackError } from 'mongoose';
+import { IBaseModel } from '../models/base';
 
 type NextFunction = (err?: CallbackError) => void;
 
-export const autoIncrementId = async function (this: Document, next: NextFunction) {
+export const autoIncrementId = async function (this: IBaseModel, next: NextFunction) {
     if (this.isNew) {
-        const model = this.constructor as Model<Document>;
+        const model = this.constructor as Model<IBaseModel>;
         try {
-            const lastDoc = await model.findOne().sort({ id: -1 }).exec();
-
-            console.log('Last Document:', lastDoc); 
-
-            if (lastDoc && lastDoc.id) {
-                this.set('id', lastDoc.id + 1);
-            } else {
-                this.set('id', 1);
-            }
+            // Find the last document to determine the next ID
+            const lastDoc = await model.findOne().sort({ _id: -1 }).exec();
+            const nextId = lastDoc ? lastDoc._id + 1 : 1;
+            this.set('_id', nextId);
+            this.set('id', nextId);
         } catch (err) {
             next(err as CallbackError); // Cast to CallbackError for proper typing. This is mongoose's direct Callback Error
             return; //  no further processing occurs

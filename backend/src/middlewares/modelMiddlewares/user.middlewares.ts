@@ -3,31 +3,33 @@ import Cart from '../../models/cart';
 import { IUser, IUserDocument } from '../../models/user';
 import { NextFunction } from '../../utils/type';
 
-export const handleUserCart = {
-    // Middleware to create a Cart when a User is created
-    async createCartOnUserSave(this: IUser, next: NextFunction) {
-        if (this.isNew) {
-            try {
-                await Cart.create({ userId: this._id });
-                next();
-            } catch (error) {
-                next(error);
-            }
-        } else {
-            next();
-        }
-    },
+// Auto deletion should be put in Service layers
 
-    // Middleware to delete Cart when a User is deleted
-    async deleteCartOnUserRemove(this: IUser, next: Function) {
-        try {
-            await Cart.deleteOne({ userId: this._id });
-            next();
-        } catch (error) {
-            next(error);
-        }
-    }
-};
+// export const handleUserCart = {
+//     // Middleware to create a Cart when a User is created
+//     async createCartOnUserSave(this: IUser, next: NextFunction) {
+//         if (this.isNew) {
+//             try {
+//                 await Cart.create({ userId: this._id });
+//                 next();
+//             } catch (error) {
+//                 next(error);
+//             }
+//         } else {
+//             next();
+//         }
+//     },
+
+//     // Middleware to delete Cart when a User is deleted
+//     async deleteCartOnUserRemove(this: IUser, next: Function) {
+//         try {
+//             await Cart.deleteOne({ userId: this._id });
+//             next();
+//         } catch (error) {
+//             next(error);
+//         }
+//     }
+// };
 
 // https://www.npmjs.com/package/bcrypt
 /* 

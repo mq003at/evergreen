@@ -2,7 +2,7 @@ import mongoose, { Schema, Document, Model } from 'mongoose';
 import bcrypt from 'bcrypt';
 import BaseModel, { IBaseModel } from './base';
 import { autoIncrementId } from '../middlewares/autoIncrement';
-import { handleUserCart, hashPassword } from '../middlewares/modelMiddlewares/user.middlewares';
+import { hashPassword } from '../middlewares/modelMiddlewares/user.middlewares';
 
 /*
 * Custom type for Mongoose Document, User version.
@@ -37,12 +37,9 @@ userSchema.methods.comparePassword = async function (candidatePassword: string):
     return bcrypt.compare(candidatePassword, this.password);
 };
 
-// Apply the auto-increment ID middleware
-userSchema.pre('save', autoIncrementId);
-
 // Apply the `deleteCartOnUserRemove` middleware
-userSchema.post('findOneAndDelete', handleUserCart.deleteCartOnUserRemove);
-userSchema.post('deleteOne', handleUserCart.deleteCartOnUserRemove);
+// userSchema.post('findOneAndDelete', handleUserCart.deleteCartOnUserRemove);
+// userSchema.post('deleteOne', handleUserCart.deleteCartOnUserRemove);
 
 // Inherit from BaseModel schema
 userSchema.add(BaseModel.schema.obj);

@@ -2,6 +2,8 @@ import mongoose, { Schema, Document } from 'mongoose';
 import BaseModel, { IBaseModel } from './base';
 import { autoIncrementId } from '../middlewares/autoIncrement';
 
+// Documentation at: https://marketplace.visualstudio.com/items?itemName=AIC.docify
+
 /**
  * @module models/author
  * 
@@ -65,9 +67,6 @@ const authorSchema: Schema<IAuthor> = new Schema({
     name: { type: String, required: true },
     bio: { type: String, required: true }
 });
-
-// Apply the auto-increment ID middleware
-authorSchema.pre('save', autoIncrementId);
 
 // Inherit from BaseModel schema
 authorSchema.add(BaseModel.schema.obj);

@@ -16,9 +16,6 @@ const loanSchema: Schema<ILoan> = new Schema({
     returnDate: { type: Date, required: true }
 });
 
-// Apply the auto-increment ID middleware
-loanSchema.pre('save', autoIncrementId);
-
 // Inherit from BaseModel schema
 loanSchema.add(BaseModel.schema.obj);
 

@@ -1,5 +1,6 @@
 import mongoose, { Schema, Document } from 'mongoose';
 import { setUpdatedAtOnUpdate } from '../middlewares/timeStamp';
+import { autoIncrementId } from '../middlewares/autoIncrement';
 
 /*
 * MongoDb treats data as Dynamic JSON object called Document.
@@ -10,6 +11,7 @@ import { setUpdatedAtOnUpdate } from '../middlewares/timeStamp';
 */
 
 export interface IBaseModel extends Document {
+    _id: number;
     id: number;
     createdAt: Date;
     updatedAt: Date;
@@ -20,15 +22,20 @@ export interface IBaseModel extends Document {
 * data is added into the database.
 */
 export interface IBaseDocument extends Document {
+    _id: number;
     id: number;
 }
 
 // Define a generic base schema
 const baseSchema: Schema<IBaseModel> = new Schema({
+    _id: { type: Number, unique: true },
     id: { type: Number, unique: true },
     createdAt: { type: Date, default: Date.now, immutable: true },
     updatedAt: { type: Date, default: Date.now }
 });
+
+// Apply autoincrement
+baseSchema.pre('save', autoIncrementId);
 
 // Apply the setUpdatedAtOnUpdate middleware
 setUpdatedAtOnUpdate(baseSchema);

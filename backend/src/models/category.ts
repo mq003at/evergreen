@@ -12,8 +12,6 @@ const categorySchema: Schema<ICategory> = new Schema({
     description: { type: String, required: true }
 });
 
-// Apply the auto-increment ID middleware
-categorySchema.pre('save', autoIncrementId);
 
 // Inherit from BaseModel schema
 categorySchema.add(BaseModel.schema.obj);

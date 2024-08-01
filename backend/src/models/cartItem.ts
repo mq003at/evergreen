@@ -12,8 +12,6 @@ const cartItemSchema: Schema<ICartItem> = new Schema({
     quantity: { type: Number, required: true }
 });
 
-// Apply the auto-increment ID middleware
-cartItemSchema.pre('save', autoIncrementId);
 
 // Inherit from BaseModel schema
 cartItemSchema.add(BaseModel.schema.obj);
