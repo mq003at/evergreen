@@ -1,22 +1,31 @@
+import mongoose from 'mongoose';
 import Book, { IBook } from '../models/book';
+import { BaseService } from './baseService';
+import { LoanService } from './loanService';
 
-export const getAllBooks = async (): Promise<IBook[]> => {
-    return await Book.find();
-};
+export class BookService extends BaseService<IBook> {
+    private loanService: LoanService;
+    constructor() {
+        super(Book);
+        this.loanService = new LoanService();
+    }
 
-export const getBookById = async (id: string): Promise<IBook | null> => {
-    return await Book.findById(id);
-};
+    async delete(id: string): Promise<IBook | null> {
+        const deleteSession = await mongoose.startSession();
+        deleteSession.startTransaction();
 
-export const createBook = async (bookData: Partial<IBook>): Promise<IBook> => {
-    const book = new Book(bookData);
-    return await book.save();
-};
+        try {
+            await this.loanService.deleteAllFromBookId(id);
+            const deletedBook = await this.model.findByIdAndDelete(id).session(deleteSession);
 
-export const updateBook = async (id: string, bookData: Partial<IBook>): Promise<IBook | null> => {
-    return await Book.findByIdAndUpdate(id, bookData, { new: true });
-};
-
-export const deleteBook = async (id: string): Promise<IBook | null> => {
-    return await Book.findByIdAndDelete(id);
-};
+            await deleteSession.commitTransaction();
+            deleteSession.endSession();
+            return deletedBook;
+        } catch(err) {
+            const error = err as Error;
+            await deleteSession.abortTransaction();
+            deleteSession.endSession();
+            throw new Error(`Failed to delete Book: ${error.message}`) 
+        }
+    }
+}

@@ -9,7 +9,7 @@ export interface ILoan extends IBaseModel {
     returnDate: Date;
 }
 
-const loanSchema: Schema<ILoan> = new Schema({
+export const loanSchema: Schema<ILoan> = new Schema({
     book: { type: mongoose.Schema.Types.ObjectId, ref: 'Book', required: true },
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     loanDate: { type: Date, required: true },

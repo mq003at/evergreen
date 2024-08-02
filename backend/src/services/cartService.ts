@@ -1,47 +1,35 @@
+import mongoose from 'mongoose';
 import Cart, { ICart } from '../models/cart';
-import CartItem, { ICartItem } from '../models/cartItem';
+import CartItem from '../models/cartItem';
+import { BaseService } from './baseService';
 
-export const getCartByUserId = async (userId: string): Promise<ICart | null> => {
-    return await Cart.findOne({ userId }).populate('items.bookId');
-};
-
-export const addToCart = async (userId: string, bookId: string): Promise<ICartItem> => {
-    let cart = await Cart.findOne({ userId });
-
-    if (!cart) {
-        cart = new Cart({ userId });
-        await cart.save();
+export class CartService extends BaseService<ICart> {
+    constructor() {
+        super(Cart);
     }
 
-    const cartItem = new CartItem({ cartId: cart._id, bookId });
-    return await cartItem.save();
-};
+    async delete(id: string): Promise<ICart | null> {
+        const deleteSession = await mongoose.startSession();
+        deleteSession.startTransaction();
 
-export const removeFromCart = async (userId: string, bookId: string): Promise<ICartItem | null> => {
-    const cart = await Cart.findOne({ userId });
+        try {
+            const cart = await Cart.findOne({ id }).session(deleteSession);
+            if (!cart) {
+                throw new Error ('Cart not found');
+            }
 
-    if (!cart) {
-        throw new Error('Cart not found');
+            await CartItem.deleteMany({ cartId: cart._id }).session(deleteSession);
+            const deletedCart = await Cart.findByIdAndDelete(cart._id).session(deleteSession);
+            await deleteSession.commitTransaction();
+            deleteSession.endSession();
+            
+            return deletedCart;
+        }
+            catch(err) {
+                const error = err as Error;
+                await deleteSession.abortTransaction();
+                deleteSession.endSession();
+                throw new Error('Failed to delete Cart.')
+            }
+        }
     }
-
-    return await CartItem.findOneAndDelete({ cartId: cart._id, bookId });
-};
-
-export const clearCart = async (userId: string): Promise<void> => {
-    const cart = await Cart.findOne({ userId });
-
-    if (!cart) {
-        throw new Error('Cart not found');
-    }
-
-    await CartItem.deleteMany({ cartId: cart._id });
-}
-
-export const deleteCart = async(userId: string): Promise<void> => {
-    const cart = await Cart.findOne({ user: userId });
-
-    if (cart) {
-        await CartItem.deleteMany({ _id: { $in: cart.items }});
-        await Cart.findByIdAndDelete(cart._id);
-    }
-}

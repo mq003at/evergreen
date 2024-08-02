@@ -5,8 +5,4 @@ export class AuthorService extends BaseService<IAuthor> {
     constructor() {
         super(Author);
     }
-
-    async getAll(): Promise<IAuthor[]> {
-        return await Author.find();
-    }
 }

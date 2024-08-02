@@ -22,4 +22,8 @@ export abstract class BaseService<T extends Document> {
     async delete(id: string): Promise<T | null> {
         return await this.model.findByIdAndDelete(id).exec();
     }
+
+    async getAll(): Promise<T[] | null> {
+        return await this.model.find().exec();
+    }
 }

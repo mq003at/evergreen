@@ -1,70 +1,81 @@
-// baseController.ts
+// controllers/BaseController.ts
 
 import { Request, Response, NextFunction } from 'express';
 import { BaseService } from '../services/baseService';
 import { Document } from 'mongoose';
 
-export class BaseController<T extends Document> {
+export class BaseController<T extends Document<unknown, any, any>> {
     protected service: BaseService<T>;
 
     constructor(service: BaseService<T>) {
         this.service = service;
     }
 
-    // Create a new document
-    async create(req: Request, res: Response, next: NextFunction): Promise<void> {
+    // Create a new resource
+    public create = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
-            const data = req.body;
-            const result = await this.service.create(data);
-            res.status(201).json(result);
+            const data = await this.service.create(req.body);
+            res.status(201).json(data);
         } catch (error) {
             next(error);
         }
-    }
+    };
 
-    // Find a document by ID
-    async findById(req: Request, res: Response, next: NextFunction): Promise<void> {
+    // Get a resource by ID
+    public read = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+        const { id } = req.params;
+
         try {
-            const id = req.params.id;
-            const result = await this.service.findById(id);
-            if (result) {
-                res.status(200).json(result);
+            const data = await this.service.findById(id);
+            if (!data) {
+                res.status(404).json({ message: `Resource with ID ${id} not found` });
             } else {
-                res.status(404).json({ message: 'Not Found' });
+                res.status(200).json(data);
             }
         } catch (error) {
             next(error);
         }
-    }
+    };
 
-    // Update a document by ID
-    async updateById(req: Request, res: Response, next: NextFunction): Promise<void> {
+    // Update a resource by ID
+    public update = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+        const { id } = req.params;
+
         try {
-            const id = req.params.id;
-            const updateData = req.body;
-            const result = await this.service.update(id, updateData);
-            if (result) {
-                res.status(200).json(result);
+            const data = await this.service.update(id, req.body);
+            if (!data) {
+                res.status(404).json({ message: `Resource with ID ${id} not found` });
             } else {
-                res.status(404).json({ message: 'Not Found' });
+                res.status(200).json(data);
             }
         } catch (error) {
             next(error);
         }
-    }
+    };
 
-    // Delete a document by ID
-    async deleteById(req: Request, res: Response, next: NextFunction): Promise<void> {
+    // Delete a resource by ID
+    public delete = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+        const { id } = req.params;
+
         try {
-            const id = req.params.id;
-            const result = await this.service.delete(id);
-            if (result) {
-                res.status(200).json({ message: 'Deleted successfully' });
+            const data = await this.service.delete(id);
+            if (!data) {
+                res.status(404).json({ message: `Resource with ID ${id} not found` });
             } else {
-                res.status(404).json({ message: 'Not Found' });
+                res.status(200).json({ message: `Resource with ID ${id} has been deleted`, data });
             }
         } catch (error) {
             next(error);
         }
-    }
+    };
+
+    // Get all resources
+    public getAll = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+        try {
+            const data = await this.service.getAll();
+            res.status(200).json(data);
+        } catch (error) {
+            next(error);
+        }
+    };
 }
