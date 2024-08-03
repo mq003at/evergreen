@@ -1,16 +1,17 @@
-import express from 'express';
-import {
-    getCartByUserIdHandler,
-    addToCartHandler,
-    removeFromCartHandler,
-    clearCartHandler
-} from '../controllers/cartController';
+import { CartController } from "../controllers/cartController";
+import { ICart } from "../models/cart";
+import { BaseRoutes } from "./baseRoutes";
 
-const router = express.Router();
+export class CartRoutes extends BaseRoutes<ICart> {
+    constructor(){
+        super(new CartController());
+    }
 
-router.get('/:userId', getCartByUserIdHandler);
-router.post('/:userId/add', addToCartHandler);
-router.delete('/:userId/remove', removeFromCartHandler);
-router.delete('/:userId/clear', clearCartHandler);
+    protected initilizeRoutes() {
+        this.router.get('/:id', this.controller.read);
+        this.router.put('/:id', this.controller.update)
+    }
+}
 
-export default router;
+const cartRoutes = new CartRoutes();
+export default cartRoutes.router;

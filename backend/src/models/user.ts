@@ -9,6 +9,9 @@ import { hashPassword } from '../middlewares/modelMiddlewares/user.middlewares';
 * Note that for MongoDb, the data entry is DYNAMIC, meaning there could be more fields than what we declared in schema. Like, just add them in.
 * By defining IUserDocument, I declare that no matter what, there would be a password field in the Document
 */
+
+export type Role = 'Admin' | 'User'
+
 export interface IUserDocument extends Document {
     password: string;
 }
@@ -18,7 +21,7 @@ export interface IUser extends IBaseModel {
     name: string;
     email: string;
     password: string;
-    role: string;
+    role: Role;
     comparePassword(candidatePassword: string): Promise<boolean>;
 }
 
@@ -26,7 +29,7 @@ const userSchema: Schema<IUser> = new Schema({
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    role: { type: String, default: 'member' }
+    role: { type: String, enum: ['Admin', 'User'], default: 'User' }
 });
 
 // Apply the password hashing middleware

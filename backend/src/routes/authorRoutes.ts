@@ -2,14 +2,14 @@
 
 import { Router } from 'express';
 import { AuthorController } from '../controllers/authorController'; 
+import { BaseRoutes } from './baseRoutes';
+import { IAuthor } from '../models/author';
 
-const router = Router();
-const authorController = new AuthorController();
+class AuthorRoutes extends BaseRoutes<IAuthor> {
+    constructor() {
+        super(new AuthorController());
+    }
+}
 
-router.post('/', (req, res, next) => authorController.create(req, res, next));
-router.get('/', (req, res, next) => authorController.getAll(req, res, next)); 
-router.get('/:id', (req, res, next) => authorController.findById(req, res, next));
-router.put('/:id', (req, res, next) => authorController.updateById(req, res, next));
-router.delete('/:id', (req, res, next) => authorController.deleteById(req, res, next));
-
-export default router;
+const authorRoutes = new AuthorRoutes();
+export default authorRoutes.router;

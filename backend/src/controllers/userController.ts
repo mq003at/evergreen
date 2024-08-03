@@ -1,95 +1,65 @@
-import { Request, Response } from 'express';
-import passport from 'passport';
-import { getAllUsers, getUserById, createUser, updateUser, deleteUser } from '../services/userService';
+import { NextFunction, Request, Response } from "express";
+import { UserService } from "../services/userService";
+import { IUser } from "../models/user";
+import { UserEmailRequest, UserRequest, UserUpdateRequest } from "../models/DTO/userDTO";
 
-import { IUser } from '../models/user';
+const userService = new UserService()
 
-export const getAllUsersHandler = async (req: Request, res: Response): Promise<void> => {
-    try {
-        const users = await getAllUsers();
-        res.json(users);
-    } catch (err) {
-        const error = err as Error;
-        res.status(500).send(error.message);
-    }
-};
-
-export const getUserByIdHandler = async (req: Request, res: Response): Promise<void> => {
-    try {
-        const user = await getUserById(req.params.id);
-        if (!user) {
-            res.status(404).send('User not found');
-            return;
+export class UserController {
+    public async register(req: UserRequest, res: Response, next: NextFunction): Promise<void> {
+        const { email, password } = req.body;
+        try {
+            const user = await userService.register(email, password);
+            if (!user) {
+                res.json(500).json({ message: `There is a problem registrering new user. Please try it again.` } )
+            }
+            else {
+                res.status(201).json(user);
+            }
+        } catch (error) {
+            next(error)
         }
-        res.json(user);
-    } catch (err) {
-        const error = err as Error;
-        res.status(500).send(error.message);
     }
-};
 
-export const createUserHandler = async (req: Request, res: Response): Promise<void> => {
-    try {
-        const user = await createUser(req.body);
-        res.status(201).json(user);
-    } catch (err) {
-        const error = err as Error;
-        res.status(400).send(error.message);
-    }
-};
-
-export const updateUserHandler = async (req: Request, res: Response): Promise<void> => {
-    try {
-        const user = await updateUser(req.params.id, req.body);
-        if (!user) {
-            res.status(404).send('User not found');
-            return;
+    public login = async (req: UserRequest, res: Response, next: NextFunction): Promise<void> => {
+        const { email, password } = req.body;
+        try {
+            const user = await userService.login(email, password);
+            res.status(200).json(user);
+        } catch (error) {
+            next(error);
         }
-        res.json(user);
-    } catch (err) {
-        const error = err as Error;
-        res.status(400).send(error.message);
-    }
-};
+    };
 
-export const deleteUserHandler = async (req: Request, res: Response): Promise<void> => {
-    try {
-        const user = await deleteUser(req.params.id);
-        if (!user) {
-            res.status(404).send('User not found');
-            return;
+    public isRegistered = async (req: UserEmailRequest, res: Response, next: NextFunction): Promise<void> => {
+        const { email } = req.body;
+        try {
+            const isRegistered = await userService.isRegistered(email);
+            if (isRegistered) res.status(200).json({ isRegistered: true});
+            else res.status(200).json({ isRegistered: false });
+        } catch (error) {
+            next(error);
         }
-        res.send('User deleted');
-    } catch (err) {
-        const error = err as Error;
-        res.status(500).send(error.message);
     }
-};
 
-export const loginHandler = (req: Request, res: Response, next: Function) => {
-    passport.authenticate('local', (err: Error, user: IUser, info: { message: string }) => {
-        if (err) return next(err);
-        if (!user) return res.status(401).send(info.message);
-        req.logIn(user, (err) => {
-            if (err) return next(err);
-            res.json(user);
-        });
-    })(req, res, next);
-};
-
-export const logoutHandler = (req: Request, res: Response) => {
-    req.logout((err) => {
-        if (err) {
-            const error = err as Error;
-            return res.status(500).send(error.message);
+    public update = async (req: UserUpdateRequest, res: Response, next: NextFunction): Promise<void> => {
+        const { id } = req.params;
+        try {
+            const updatedUser = await userService.update(id, req.body);
+            res.status(200).json(updatedUser);
+        } catch (error) {
+            next (error);
         }
-        res.send('Logged out');
-    });
-};
-
-export const getCurrentUserHandler = (req: Request, res: Response) => {
-    if (req.isAuthenticated()) {
-        return res.json(req.user);
     }
-    res.status(401).send('Not authenticated');
-};
+
+    public delete = async(req: Request, res: Response, next: NextFunction): Promise<void> => {
+        const { id } = req.params;
+        try {
+            const deletedUser = await userService.delete(id);
+            if (deletedUser) res.status(200).json({ isDeleted: true });
+            else res.status(200).json({ isDeleted: false });
+        } catch (error) {
+            next(error)
+        }
+    }
+}

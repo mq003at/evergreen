@@ -1,18 +1,12 @@
-import express from 'express';
-import {
-    getAllBooksHandler,
-    getBookByIdHandler,
-    createBookHandler,
-    updateBookHandler,
-    deleteBookHandler
-} from '../controllers/bookController';
+import { BookController } from "../controllers/bookController";
+import { IBook } from "../models/book";
+import { BaseRoutes } from "./baseRoutes";
 
-const router = express.Router();
+class BookRoutes extends BaseRoutes<IBook> {
+    constructor() {
+        super(new BookController());
+    }
+}
 
-router.get('/', getAllBooksHandler);
-router.get('/:id', getBookByIdHandler);
-router.post('/', createBookHandler);
-router.put('/:id', updateBookHandler);
-router.delete('/:id', deleteBookHandler);
-
-export default router;
+const bookRoutes = new BookRoutes();
+export default bookRoutes.router;
