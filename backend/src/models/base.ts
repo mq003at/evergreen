@@ -27,15 +27,11 @@ export interface IBaseDocument extends Document {
 }
 
 // Define a generic base schema
-const baseSchema: Schema<IBaseModel> = new Schema({
-    _id: { type: Number, unique: true },
+export const baseSchema: Schema<IBaseModel> = new Schema({
     id: { type: Number, unique: true },
     createdAt: { type: Date, default: Date.now, immutable: true },
     updatedAt: { type: Date, default: Date.now }
 });
-
-// Apply autoincrement
-baseSchema.pre('save', autoIncrementId);
 
 // Apply the setUpdatedAtOnUpdate middleware
 setUpdatedAtOnUpdate(baseSchema);

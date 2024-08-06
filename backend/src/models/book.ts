@@ -18,6 +18,7 @@ const bookSchema: Schema<IBook> = new Schema({
 
 // Inherit from BaseModel schema
 bookSchema.add(BaseModel.schema.obj);
+bookSchema.pre('save', autoIncrementId);
 
 const Book = mongoose.model<IBook>('Book', bookSchema);
 export default Book;

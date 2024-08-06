@@ -14,6 +14,7 @@ export class BaseController<T extends Document<unknown, any, any>> {
     // Create a new resource
     public create = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
+            console.log('dataC', req.body)
             const data = await this.service.create(req.body);
             res.status(201).json(data);
         } catch (error) {

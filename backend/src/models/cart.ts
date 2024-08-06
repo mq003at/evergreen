@@ -14,6 +14,7 @@ const cartSchema: Schema<ICart> = new Schema({
 
 // Inherit from BaseModel schema
 cartSchema.add(BaseModel.schema.obj);
+cartSchema.pre('save', autoIncrementId);
 
 const Cart = mongoose.model<ICart>('Cart', cartSchema);
 export default Cart;

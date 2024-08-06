@@ -12,9 +12,9 @@ const categorySchema: Schema<ICategory> = new Schema({
     description: { type: String, required: true }
 });
 
-
 // Inherit from BaseModel schema
 categorySchema.add(BaseModel.schema.obj);
+categorySchema.pre('save', autoIncrementId);
 
 // Create the Category model
 const Category = mongoose.model<ICategory>('Category', categorySchema);

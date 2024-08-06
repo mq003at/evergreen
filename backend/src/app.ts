@@ -10,6 +10,7 @@ import passport from './configs/passport';
 import swaggerUi from 'swagger-ui-express';
 import swaggerSpec from './configs/swaggerConfig';
 import dotenv from 'dotenv';
+import authorRoutes from './routes/authorRoutes';
 
 dotenv.config();
 
@@ -41,10 +42,10 @@ app.get('/', (req, res) => {
 });
 
 // Routes
-app.use('/api/users', userRoutes);
 app.use('/api/books', bookRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/carts', cartRoutes);
+app.use('/api/authors', authorRoutes);
 
 // Home route
 app.get('/', (req, res) => {

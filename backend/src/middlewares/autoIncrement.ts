@@ -7,14 +7,17 @@ export const autoIncrementId = async function (this: IBaseModel, next: NextFunct
     if (this.isNew) {
         const model = this.constructor as Model<IBaseModel>;
         try {
-            // Find the last document to determine the next ID
-            const lastDoc = await model.findOne().sort({ _id: -1 }).exec();
-            const nextId = lastDoc ? lastDoc._id + 1 : 1;
-            this.set('_id', nextId);
-            this.set('id', nextId);
+            const lastDoc = await model.findOne().sort({ id: -1 }).exec();
+            console.log('Last Document:', lastDoc);
+
+            if (lastDoc && lastDoc.id) {
+                this.id = lastDoc.id + 1;
+            } else {
+                this.id = 1;
+            }
         } catch (err) {
-            next(err as CallbackError); // Cast to CallbackError for proper typing. This is mongoose's direct Callback Error
-            return; //  no further processing occurs
+            next(err as CallbackError);
+            return;
         }
     }
     next();

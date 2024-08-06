@@ -5,6 +5,8 @@ import bcrypt from 'bcrypt';
 import { CartService } from './cartService';
 import Loan from "../models/loan";
 import { LoanService } from "./loanService";
+import { Purpose } from "../utils/jwt";
+import { UserNoPasswordResponse } from "../models/DTO/userDTO";
 
 export class UserService {
     private cartService: CartService;
@@ -19,14 +21,25 @@ export class UserService {
         throw new Error('Unable to get all the Users.')
     }
 
-    async register(email: string, password: string): Promise<IUser> {
-        const hashedPassword = await bcrypt.hash(password!, 10);
-        const user = new User({ ...{
-            name: 'Annonymous User',
-            email: email,
+    async register(email: string, password: string, purpose: Purpose): Promise<UserNoPasswordResponse> {
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const user = new User({
+            name: 'Anonymous User',
+            email,
+            password: hashedPassword,
             role: 'User',
-        }, password: hashedPassword });
-        return await user.save();
+        });
+
+        const savedUser = await user.save();
+        const userNoPassword: UserNoPassword = {
+            _id: savedUser._id,
+            id: savedUser.id,
+            createdAt: savedUser.createdAt,
+            updatedAt: savedUser.updatedAt,
+            name: savedUser.name,
+            email: savedUser.email,
+            role: savedUser.role,
+        };
     }
 
     async login(email: string, password: string): Promise<IUser | null> {

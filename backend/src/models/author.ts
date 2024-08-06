@@ -70,6 +70,7 @@ const authorSchema: Schema<IAuthor> = new Schema({
 
 // Inherit from BaseModel schema
 authorSchema.add(BaseModel.schema.obj);
+authorSchema.pre('save', autoIncrementId);
 
 const Author = mongoose.model<IAuthor>('Author', authorSchema);
 export default Author;

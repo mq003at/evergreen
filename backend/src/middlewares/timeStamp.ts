@@ -20,5 +20,5 @@ export function setUpdatedAtOnUpdate(schema: Schema) {
     schema.pre('updateOne', function (next) {
         this.set({ updatedAt: new Date() });
         next();
-    });
+    }); 
 }

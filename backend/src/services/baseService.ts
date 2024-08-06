@@ -8,6 +8,7 @@ export abstract class BaseService<T extends Document> {
     }
 
     async create(data: Partial<T>): Promise<T> {
+        console.log('data', data)
         return await this.model.create(data);
     }
 

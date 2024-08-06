@@ -7,9 +7,9 @@ const userService = new UserService()
 
 export class UserController {
     public async register(req: UserRequest, res: Response, next: NextFunction): Promise<void> {
-        const { email, password } = req.body;
+        const { email, password, purpose } = req.body;
         try {
-            const user = await userService.register(email, password);
+            const user = await userService.register(email, password, purpose);
             if (!user) {
                 res.json(500).json({ message: `There is a problem registrering new user. Please try it again.` } )
             }

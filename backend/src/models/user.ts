@@ -46,6 +46,7 @@ userSchema.methods.comparePassword = async function (candidatePassword: string):
 
 // Inherit from BaseModel schema
 userSchema.add(BaseModel.schema.obj);
+userSchema.pre('save', autoIncrementId);
 
 const User = mongoose.model<IUser>('User', userSchema);
 export default User;
