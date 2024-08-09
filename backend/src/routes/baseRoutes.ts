@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { BaseController } from "../controllers/baseController";
 import { Document } from "mongoose";
+import { authenticateAdmin } from "../middlewares/authentication";
 
 export class BaseRoutes<T extends Document<unknown, any, any>> {
     public router: Router;
@@ -13,10 +14,10 @@ export class BaseRoutes<T extends Document<unknown, any, any>> {
     }
 
     private initializeRoutes() {
-        this.router.post('/', this.controller.create);
+        this.router.post('/', authenticateAdmin ,this.controller.create);
         this.router.get('/:id', this.controller.read);
-        this.router.put('/:id', this.controller.update);
-        this.router.delete('/:id', this.controller.delete);
+        this.router.put('/:id', authenticateAdmin, this.controller.update);
+        this.router.delete('/:id', authenticateAdmin, this.controller.delete);
         this.router.get('/', this.controller.getAll);
     }
 }

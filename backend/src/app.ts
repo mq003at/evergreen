@@ -30,8 +30,8 @@ app.use(
         saveUninitialized: false
     })
 );
-app.use(passport.initialize());
-app.use(passport.session());
+// app.use(passport.initialize());
+// app.use(passport.session());
 
 // Swagger UI setup
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
@@ -46,6 +46,7 @@ app.use('/api/books', bookRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/carts', cartRoutes);
 app.use('/api/authors', authorRoutes);
+app.use('/api/users', userRoutes);
 
 // Home route
 app.get('/', (req, res) => {

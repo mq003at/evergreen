@@ -1,4 +1,4 @@
-import { Request } from "express";
+import { Request, Response } from "express";
 import { IUser, Role } from "../user";
 import { JwtPayload } from "jsonwebtoken";
 import { BaseDTO } from "./baseDTO";
@@ -20,10 +20,24 @@ export interface UserEmailRequest extends Request {
     body: { email: string }
 }
 
-export interface UserNoPassword extends BaseDTO {
+export class UserNoPassword implements BaseDTO {
+    _id: number;
+    id: number;
+    createdAt: Date;
+    updatedAt: Date;
     name: string
     email: string
     role: Role
+
+    constructor(user: IUser) {
+        this._id = user._id;
+        this.id = user.id;
+        this.createdAt = user.createdAt;
+        this.updatedAt = user.updatedAt;
+        this.name = user.name;
+        this.email = user.email;
+       this.role = user.role;
+    }
 }
 
 export interface TokenResponse {
@@ -31,8 +45,7 @@ export interface TokenResponse {
     purpose: Purpose
 }
 
-export interface UserNoPasswordResponse extends Request {
+export interface UserNoPasswordResponse {
     token: TokenResponse
     user: UserNoPassword
 }
-

@@ -7,13 +7,15 @@ export interface IBook extends IBaseModel {
     author: mongoose.Types.ObjectId; // Reference to Author model
     category: mongoose.Types.ObjectId;
     publishedDate: Date;
+    price: number;
 }
 
 const bookSchema: Schema<IBook> = new Schema({
     title: { type: String, required: true },
     author: { type: mongoose.Schema.Types.ObjectId, ref: 'Author' },
     category: { type: mongoose.Schema.Types.ObjectId },
-    publishedDate: { type: Date, required: true }
+    publishedDate: { type: Date, required: true },
+    price: { type: Number, required: true }
 });
 
 // Inherit from BaseModel schema

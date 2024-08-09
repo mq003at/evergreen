@@ -9,25 +9,45 @@ export class UserController {
     public async register(req: UserRequest, res: Response, next: NextFunction): Promise<void> {
         const { email, password, purpose } = req.body;
         try {
-            const user = await userService.register(email, password, purpose);
-            if (!user) {
-                res.json(500).json({ message: `There is a problem registrering new user. Please try it again.` } )
+            const registeredUser = await userService.register(email, password, purpose, false);
+            if (!registeredUser) {
+                res.json(403).json({ message: `There is a problem registrering new user. Please try it again.` } )
             }
             else {
-                res.status(201).json(user);
+                res.status(201).json(registeredUser);
             }
         } catch (error) {
             next(error)
+            res.json(403).json({ message: `There is a problem registrering new user. Please try it again.` } )
+        }
+    }
+
+    public async adminRegister(req: UserRequest, res: Response, next: NextFunction): Promise<void> {
+        const { email, password, purpose } = req.body;
+        try {
+            const registeredUser = await userService.register(email, password, purpose, true);
+            if (!registeredUser) {
+                res.json(403).json({ message: `There is a problem registrering new user. Please try it again.` } )
+            }
+            else {
+                res.status(201).json(registeredUser);
+            }
+        } catch (error) {
+            next(error)
+            res.json(403).json({ message: `There is a problem registrering new user. Please try it again.` } )
         }
     }
 
     public login = async (req: UserRequest, res: Response, next: NextFunction): Promise<void> => {
-        const { email, password } = req.body;
+        const { email, password, purpose } = req.body;
         try {
-            const user = await userService.login(email, password);
-            res.status(200).json(user);
+            const loginedUser = await userService.login(email, password, purpose);
+
+            if (typeof loginedUser === "string") res.status(403).json(loginedUser);
+            else res.status(200).json(loginedUser);
         } catch (error) {
             next(error);
+            res.json(403).json({ message: `There is a problem logging in user. Please try it again.` } )
         }
     };
 
@@ -39,6 +59,7 @@ export class UserController {
             else res.status(200).json({ isRegistered: false });
         } catch (error) {
             next(error);
+            res.json(403).json({ message: `There is a problem checking user registration status. Please try it again.` } )
         }
     }
 
@@ -49,6 +70,7 @@ export class UserController {
             res.status(200).json(updatedUser);
         } catch (error) {
             next (error);
+            res.json(403).json({ message: `There is a problem updating user. Please try it again.` } )
         }
     }
 
@@ -60,6 +82,7 @@ export class UserController {
             else res.status(200).json({ isDeleted: false });
         } catch (error) {
             next(error)
+            res.json(403).json({ message: `There is a problem deleting user. Please try it again.` } )
         }
     }
 }

@@ -51,15 +51,17 @@ import { NextFunction } from '../../utils/type';
 */
 
 // Middleware function to hash passwords
-export const hashPassword = function (this: IUserDocument, next: NextFunction) {
-    if (!this.isModified('password')) {
-        return next();
-    }
-    bcrypt.genSalt(10)
-        .then(salt => bcrypt.hash(this.password, salt))
-        .then(hash => {
-            this.password = hash;
-            next();
-        })
-        .catch(err => next(err));
-};
+// export const hashPassword = function (this: IUserDocument, next: NextFunction) {
+//     if (!this.isModified('password')) {
+//         return next();
+//     }
+//     bcrypt.genSalt(10)
+//         .then(salt => bcrypt.hash(this.password, salt))
+//         .then(hash => {
+//             this.password = hash;
+//             next();
+//         })
+//         .catch(err => next(err));
+// };
+
+export default {}

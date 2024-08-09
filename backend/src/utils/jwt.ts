@@ -10,15 +10,19 @@ const iss = process.env.JWT_ISS || 'Evergreen Oy'
 
 export type Purpose = 'temporary' | 'rememberMe';
 export interface TokenPayload {
-    sub: string;
-    role: string;
+    sub: number;
+    role: Role;
     iat: number;
     exp: number;
     iss: string;
     purpose: Purpose;
 }
 
-export const generateToken = (userId: string, role: Role, purpose: Purpose): string => {
+export interface VerifyPayload {
+    tokenPayload: TokenPayload
+}
+
+export const generateToken = (userId: number, role: Role, purpose: Purpose): string => {
     const expiresIn = (purpose === 'temporary') ? dayExpiration : monthExpiration;
     const iat = Math.floor(Date.now() / 1000);
     const exp = Math.floor(Date.now() / 1000) + (purpose === 'temporary' ? 86400 : 2592000);
