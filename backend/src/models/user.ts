@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document, Model, Mongoose, Types } from 'mongoose';
+import mongoose, { Schema, Document, Model, Mongoose, Types, Query } from 'mongoose';
 import bcrypt from 'bcrypt';
 import BaseModel, { IBaseModel } from './base';
 import { autoIncrementId } from '../middlewares/autoIncrement';
@@ -30,26 +30,30 @@ const userSchema: Schema<IUser> = new Schema({
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    cart:  { type: mongoose.Schema.Types.ObjectId, ref: 'Cart', required: true },
+    cart:  { type: mongoose.Schema.Types.ObjectId, ref: 'Cart' },
     role: { type: String, enum: ['Admin', 'User'], default: 'User' }
 });
-
-// Apply the password hashing middleware
-// Removed. Use service layer to hash the password
-// userSchema.pre<IUser>('save', hashPassword);
 
 // Method to compare passwords
 userSchema.methods.comparePassword = async function (candidatePassword: string): Promise<boolean> {
     return bcrypt.compare(candidatePassword, this.password);
 };
 
-// Apply the `deleteCartOnUserRemove` middleware
-// userSchema.post('findOneAndDelete', handleUserCart.deleteCartOnUserRemove);
-// userSchema.post('deleteOne', handleUserCart.deleteCartOnUserRemove);
-
 // Inherit from BaseModel schema
 userSchema.add(BaseModel.schema.obj);
 userSchema.pre('save', autoIncrementId);
+
+// Loan's population
+userSchema.pre(/^find/, function (next) {
+    const query = this as Query<Document<IUser>[], Document<IUser>>;
+    query.populate('bookId')
+    next();
+});
+
+userSchema.post('save', async function(doc, next) {
+    await doc.populate('bookId');
+    next();
+})
 
 const User = mongoose.model<IUser>('User', userSchema);
 export default User;

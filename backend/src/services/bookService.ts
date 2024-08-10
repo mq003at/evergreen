@@ -11,20 +11,12 @@ export class BookService extends BaseService<IBook> {
     }
 
     async delete(id: string): Promise<IBook | null> {
-        const deleteSession = await mongoose.startSession();
-        deleteSession.startTransaction();
-
         try {
             await this.loanService.deleteAllFromBookId(id);
-            const deletedBook = await this.model.findByIdAndDelete(id).session(deleteSession);
-
-            await deleteSession.commitTransaction();
-            deleteSession.endSession();
+            const deletedBook = await this.model.findByIdAndDelete(id);
             return deletedBook;
         } catch(err) {
             const error = err as Error;
-            await deleteSession.abortTransaction();
-            deleteSession.endSession();
             throw new Error(`Failed to delete Book: ${error.message}`) 
         }
     }

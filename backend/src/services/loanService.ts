@@ -7,6 +7,10 @@ export class LoanService extends BaseService<ILoan> {
         super(Loan);
     }
 
+    async findByUserId(userId: string): Promise<ILoan[] | null> {
+        return await this.model.find({ userId }).exec();
+    }
+
     async deleteAllFromUserId(userId: string): Promise<ILoan[] | null> {
         const loanDocs = await this.model.find({ userId }).exec();
         // This is just an array, not a Loan Document Collection

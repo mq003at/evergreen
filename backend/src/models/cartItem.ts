@@ -3,12 +3,14 @@ import BaseModel, { IBaseModel } from './base';
 import { autoIncrementId } from '../middlewares/autoIncrement';
 
 export interface ICartItem extends IBaseModel {
-    product: mongoose.Types.ObjectId; // Reference to Book model
+    cartId: mongoose.Types.ObjectId;
+    bookId: mongoose.Types.ObjectId;
     quantity: number;
 }
 
 const cartItemSchema: Schema<ICartItem> = new Schema({
-    product: { type: mongoose.Schema.Types.ObjectId, ref: 'Book', required: true },
+    cartId: { type: mongoose.Schema.Types.ObjectId, ref: 'Cart', required: true},
+    bookId: { type: mongoose.Schema.Types.ObjectId, ref: 'Book', required: true },
     quantity: { type: Number, required: true }
 });
 

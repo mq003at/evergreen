@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { UserService } from "../services/userService";
 import { IUser } from "../models/user";
-import { UserEmailRequest, UserRequest, UserUpdateRequest } from "../models/DTO/userDTO";
+import { UserEmailRequest, UserNoPasswordResponse, UserRequest, UserUpdateRequest } from "../models/DTO/userDTO";
 
 const userService = new UserService()
 
@@ -9,12 +9,13 @@ export class UserController {
     public async register(req: UserRequest, res: Response, next: NextFunction): Promise<void> {
         const { email, password, purpose } = req.body;
         try {
-            const registeredUser = await userService.register(email, password, purpose, false);
-            if (!registeredUser) {
-                res.json(403).json({ message: `There is a problem registrering new user. Please try it again.` } )
+            const registeredUser = await userService.register(email, password, purpose, 'User');
+            console.log("reached", registeredUser)
+            if (registeredUser instanceof UserNoPasswordResponse) {
+                res.status(201).json(registeredUser);
             }
             else {
-                res.status(201).json(registeredUser);
+                res.json(403).json()
             }
         } catch (error) {
             next(error)
@@ -25,7 +26,7 @@ export class UserController {
     public async adminRegister(req: UserRequest, res: Response, next: NextFunction): Promise<void> {
         const { email, password, purpose } = req.body;
         try {
-            const registeredUser = await userService.register(email, password, purpose, true);
+            const registeredUser = await userService.register(email, password, purpose, 'Admin');
             if (!registeredUser) {
                 res.json(403).json({ message: `There is a problem registrering new user. Please try it again.` } )
             }

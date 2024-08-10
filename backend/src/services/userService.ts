@@ -1,5 +1,5 @@
 import mongoose, { Types } from "mongoose";
-import User, { IUser } from "../models/user";
+import User, { IUser, Role } from "../models/user";
 import { BaseService } from "./baseService";
 import bcrypt from 'bcrypt';
 import { CartService } from './cartService';
@@ -22,10 +22,7 @@ export class UserService {
         throw new Error('Unable to get all the Users.')
     }
 
-    async register(email: string, password: string, purpose: Purpose, isAdmin: boolean): Promise<UserNoPasswordResponse | null> {
-        const session = await mongoose.startSession();
-        session.startTransaction();
-
+    async register(email: string, password: string, purpose: Purpose, role: Role): Promise<UserNoPasswordResponse | null> {
         try {
             const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -33,32 +30,35 @@ export class UserService {
                 name: "Anonymous User",
                 email,
                 password: hashedPassword,
-                role: isAdmin ? 'Admin' : 'User'
+                role: role
             })
 
-            const savedUser = await user.save({ session });
-
-            const cart = new Cart({ user: savedUser._id });
-            const savedCart = await cart.save({ session });
-
+            const savedUser = await user.save();
+            const cart = new Cart({ userId: savedUser._id });
+            console.log("cart before saving:", cart);
+                
+            const savedCart = await cart.save();
+            console.log("savedCart:", savedCart);
+                
             savedUser.cart = savedCart._id as unknown as Types.ObjectId;
-            await savedUser.save({ session });
+            await savedUser.save();
+            
+            console.log("savedUser with cart:", savedUser);
 
-            const tokenString = generateToken(savedUser._id, 'User', purpose);
+            console.log('savedCart', savedCart)
+            savedUser.cart = savedCart._id as unknown as Types.ObjectId;
+            await savedUser.save();
+            console.log('savedUser', savedUser)
+
+            const tokenString = generateToken(savedUser._id, role, purpose);
             const userNoPassword = new UserNoPassword(savedUser);
-            const userNoPasswordResponse: UserNoPasswordResponse = {
-                token: {
-                    tokenString: tokenString,
-                    purpose: purpose
-                },
-                user: userNoPassword
-            }
+
+            const userNoPasswordResponse = new UserNoPasswordResponse({tokenString: tokenString, purpose: purpose}, userNoPassword);
+
+            console.log('User', userNoPasswordResponse)
             return userNoPasswordResponse;
         } catch (err) {
-            await session.abortTransaction();
             return null;
-        } finally {
-            session.endSession();
         }
     }
 

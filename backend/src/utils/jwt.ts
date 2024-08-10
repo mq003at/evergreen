@@ -36,6 +36,8 @@ export const generateToken = (userId: number, role: Role, purpose: Purpose): str
         purpose
     }
 
+    console.log('payload', tokenPayload)
+
     return jwt.sign({ tokenPayload }, secret, { expiresIn });
 };
 

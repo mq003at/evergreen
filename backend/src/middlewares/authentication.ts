@@ -55,6 +55,7 @@ export const authenticateAdmin = (req: Request, res: Response, next: NextFunctio
         req.tokenPayload = decoded;
 
         const role = decoded.role;
+        console.log('role', role)
 
         if (role === 'Admin' ) {
             next();

@@ -45,7 +45,12 @@ export interface TokenResponse {
     purpose: Purpose
 }
 
-export interface UserNoPasswordResponse {
-    token: TokenResponse
-    user: UserNoPassword
+export class UserNoPasswordResponse {
+    public token: TokenResponse
+    public user: UserNoPassword
+
+    constructor(token: TokenResponse, user: UserNoPassword) {
+        this.token = token;
+        this.user = user;
+    }
 }

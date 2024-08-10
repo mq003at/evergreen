@@ -11,6 +11,9 @@ import swaggerUi from 'swagger-ui-express';
 import swaggerSpec from './configs/swaggerConfig';
 import dotenv from 'dotenv';
 import authorRoutes from './routes/authorRoutes';
+import mongoose from 'mongoose';
+import loanRoutes from './routes/loanRoutes';
+import cartItemRoutes from './routes/cartItemRoutes';
 
 dotenv.config();
 
@@ -19,6 +22,7 @@ const port = process.env.PORT || 3000;
 
 // Connect to the database
 connectDB();
+mongoose.set('debug', true);
 
 // Middleware
 app.use(express.json());
@@ -47,6 +51,8 @@ app.use('/api/categories', categoryRoutes);
 app.use('/api/carts', cartRoutes);
 app.use('/api/authors', authorRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/loans', loanRoutes);
+app.use('/api/cartItem', cartItemRoutes);
 
 // Home route
 app.get('/', (req, res) => {

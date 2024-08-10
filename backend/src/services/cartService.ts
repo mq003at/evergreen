@@ -9,26 +9,20 @@ export class CartService extends BaseService<ICart> {
     }
 
     async delete(id: string): Promise<ICart | null> {
-        const deleteSession = await mongoose.startSession();
-        deleteSession.startTransaction();
 
         try {
-            const cart = await Cart.findOne({ id }).session(deleteSession);
+            const cart = await Cart.findOne({ id })
             if (!cart) {
                 throw new Error ('Cart not found');
             }
 
-            await CartItem.deleteMany({ cartId: cart._id }).session(deleteSession);
-            const deletedCart = await Cart.findByIdAndDelete(cart._id).session(deleteSession);
-            await deleteSession.commitTransaction();
-            deleteSession.endSession();
-            
+            await CartItem.deleteMany({ cartId: cart._id })
+            const deletedCart = await Cart.findByIdAndDelete(cart._id)
+
             return deletedCart;
         }
             catch(err) {
                 const error = err as Error;
-                await deleteSession.abortTransaction();
-                deleteSession.endSession();
                 throw new Error('Failed to delete Cart.')
             }
         }
