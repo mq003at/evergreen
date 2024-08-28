@@ -1,24 +1,56 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from "react";
+import { useAppDispatch, useAppSelector } from "./redux/reduxHooks";
+import {
+  BrowserRouter,
+  Route,
+  RouterProvider,
+  Routes,
+  createBrowserRouter,
+  createRoutesFromElements,
+} from "react-router-dom";
+// import FrontPage from "./components/FrontPage";
+import { Helmet } from "react-helmet";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+import "./styles/css/index.css";
+import Header from "./components/Header/Header";
+import FrontPage from "./components/FrontPage/FrontPage";
 
 function App() {
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    const isDarkMode = localStorage.getItem('darkMode');
+    return isDarkMode === 'true';
+  })
+
+  const darkModeToggle = () => {
+    setIsDarkMode(!isDarkMode);
+  }
+
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('isDarkMode', 'true')
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('darkMode', 'false');
+    }
+  }, [isDarkMode])
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Helmet>
+        <title>Evergreen Library</title>
+        <link href="https://fonts.cdnfonts.com/css/adobe-garamond-pro-2" rel="stylesheet"></link>
+        <link href="https://fonts.cdnfonts.com/css/noto-serif-hebrew" rel="stylesheet"></link>
+      </Helmet>
+      <BrowserRouter>
+      <Header setIsDarkMode={() => setIsDarkMode} />
+        <div className="app-content top-[85px] z-0">
+          <Routes>
+            <Route path={"/"} element = {<FrontPage />} />
+          </Routes>
+        </div>
+      </BrowserRouter>
     </div>
   );
 }
