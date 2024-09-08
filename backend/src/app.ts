@@ -26,6 +26,7 @@ mongoose.set('debug', true);
 
 // Middleware
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(loggerMiddleware);
 app.use(
     session({
@@ -34,6 +35,7 @@ app.use(
         saveUninitialized: false
     })
 );
+
 // app.use(passport.initialize());
 // app.use(passport.session());
 
